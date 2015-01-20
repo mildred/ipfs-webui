@@ -25,12 +25,17 @@ module.exports = React.createClass({
       t.props.ipfs.swarm.peers(function(err, res) {
         if(err) return console.error(err);
 
-        var peers = res.Peers.sort(function(a, b) {
+        var peers = res.Strings.sort(function(a, b) {
           return a.ID > b.ID ? 1 : -1
         })
-        peers.map(function(peer) {
-          peer.ipfs = t.props.ipfs
-
+        peers = peers.map(function(peer) {
+          return {
+            Address: peer.replace(/\/[^\/]+$/, ""),
+            ID: peer.split('/')[5],
+            ipfs: t.props.ipfs
+          };
+        });
+        peers.forEach(function(peer){
           var location = t.state.locations[peer.ID]
           if(!location) {
             getLocation(peer.Address, function(err, res) {
