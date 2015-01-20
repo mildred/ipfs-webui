@@ -14,6 +14,8 @@ var browserify = require('browserify')
 var reactify = require('reactify')
 var del = require('del')
 var NwBuilder = require('node-webkit-builder')
+var url = require('url');
+var proxy = require('proxy-middleware');
 
 var paths = {
   build: 'build/',
@@ -84,7 +86,14 @@ gulp.task('server', function() {
     root: 'build',
     fallback: 'build/index.html',
     port: 8000,
-    livereload: true
+    livereload: true,
+    middleware: function(connect, o) {
+        return [ (function() {
+            var options = url.parse('http://localhost:5001/api');
+            options.route = '/api';
+            return proxy(options);
+        })() ];
+    }
   })
 })
 
